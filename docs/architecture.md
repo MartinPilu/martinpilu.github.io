@@ -24,6 +24,10 @@ Este repositorio (`martinpilu.github.io`) aloja la landing page personal y las l
 └── README.md                 # Punto de entrada / índice del repositorio
 ```
 
+## Landing personal: feed modular
+
+El feed de la landing se arma desde carpetas: `landing/content/posts/<slug>/` (imágenes + `post.json`). El script `landing/scripts/build-feed.mjs` las recorre y genera `landing/feed.json`, que el navegador carga para renderizar los posts. `feed.json` se commitea, así Pages no necesita build. Detalle en [`landing/README.md`](../landing/README.md).
+
 ## Convenciones
 
 - Cada proyecto vive en `projects/<NombreProyecto>/` y es autocontenido (su propia landing, assets y documentación).

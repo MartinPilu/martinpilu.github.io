@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de orden</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .bar { position: sticky; top: 0; z-index: 10; display: flex; gap: .75rem; align-items: center; padding: .75rem 1rem; background: #fff; border-bottom: 1px solid var(--border); }
+    .bar button { padding: .4rem .9rem; border: 1px solid var(--border); border-radius: 6px; background: #fff; cursor: pointer; font: inherit; }
+    .bar button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .bar button:disabled { opacity: .5; cursor: default; }
+    .bar .hint { color: var(--muted); font-size: .85rem; margin-left: auto; }
+    .tile { cursor: grab; }
+    .tile img { pointer-events: none; }
+    .tile.dragging { opacity: .35; }
+    .tile .n { position: absolute; left: 6px; bottom: 6px; padding: 0 .4rem; font-size: .7rem; color: #fff; background: rgba(0, 0, 0, .6); border-radius: 4px; pointer-events: none; }
+    .feed { max-width: none; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <button id="save" class="primary" disabled>Guardar orden</button>
+    <button id="reset">Volver al orden por fecha</button>
+    <span id="status"></span>
+    <span class="hint">Arrastrá las fotos para reordenarlas. Después guardá y recargá la landing.</span>
+  </div>
+  <main id="board" class="feed"></main>
+
+  <script>
+    const board = document.getElementById('board');
+    const saveBtn = document.getElementById('save');
+    const statusEl = document.getElementById('status');
+    let dragged = null;
+    let dirty = false;
+
+    const setDirty = (v) => { dirty = v; saveBtn.disabled = !v; if (v) statusEl.textContent = 'Cambios sin guardar'; };
+
+    function renumber() {
+      board.querySelectorAll('.tile').forEach((t, i) => { t.querySelector('.n').textContent = i + 1; });
+    }
+
+    function makeTile(post) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.draggable = true;
+      tile.dataset.id = post.id;
+      tile.title = post.title || post.id;
+
+      const img = document.createElement('img');
+      img.src = '/' + post.cover;
+      img.loading = 'lazy';
+      const setRatio = () => tile.style.setProperty('--ratio', img.naturalWidth / img.naturalHeight || 1);
+      img.addEventListener('load', setRatio);
+      tile.append(img);
+
+      if (post.overlay) {
+        const o = document.createElement('span');
+        o.className = `tile__overlay tile__overlay--${post.overlay.position} tile__overlay--${post.overlay.style}`;
+        o.textContent = post.overlay.text;
+        tile.append(o);
+      }
+      const n = document.createElement('span');
+      n.className = 'n';
+      tile.append(n);
+
+      tile.addEventListener('dragstart', (e) => {
+        dragged = tile;
+        tile.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', post.id);
+      });
+      tile.addEventListener('dragend', () => {
+        tile.classList.remove('dragging');
+        dragged = null;
+        renumber();
+      });
+      return tile;
+    }
+
+    board.addEventListener('dragover', (e) => {
+      if (!dragged) return;
+      e.preventDefault();
+      const target = e.target.closest('.tile');
+      if (!target || target === dragged) return;
+      const r = target.getBoundingClientRect();
+      const before = e.clientX < r.left + r.width / 2;
+      const ref = before ? target : target.nextSibling;
+      if (ref !== dragged && dragged.nextSibling !== ref) {
+        board.insertBefore(dragged, ref);
+        setDirty(true);
+      }
+    });
+    board.addEventListener('drop', (e) => e.preventDefault());
+
+    async function load() {
+      const { posts } = await (await fetch('/feed.json?' + Date.now())).json();
+      board.replaceChildren(...posts.map(makeTile));
+      const filler = document.createElement('span');
+      filler.className = 'feed__filler';
+      board.append(filler);
+      renumber();
+      setDirty(false);
+      statusEl.textContent = `${posts.length} elementos`;
+    }
+
+    async function call(method, body) {
+      const res = await fetch('/api/order', { method, headers: { 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) });
+      if (!res.ok) throw new Error((await res.json()).error);
+    }
+
+    saveBtn.addEventListener('click', async () => {
+      statusEl.textContent = 'Guardando…';
+      try {
+        await call('POST', { order: [...board.querySelectorAll('.tile')].map((t) => t.dataset.id) });
+        setDirty(false);
+        statusEl.textContent = 'Guardado ✔ (feed.json regenerado)';
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+      }
+    });
+
+    document.getElementById('reset').addEventListener('click', async () => {
+      if (!confirm('Se descarta el orden manual y se vuelve al orden por fecha. ¿Seguir?')) return;
+      try { await call('DELETE'); await load(); statusEl.textContent = 'Orden por fecha restaurado'; }
+      catch (err) { statusEl.textContent = 'Error: ' + err.message; }
+    });
+
+    window.addEventListener('beforeunload', (e) => { if (dirty) e.preventDefault(); });
+    load();
+  </script>
+</body>
+</html>

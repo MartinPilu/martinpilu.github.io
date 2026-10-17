@@ -3,29 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Martín Pilú</title>
+  <title>Martín Pilu</title>
+  <meta name="description" content="Portfolio personal de Martín Pilu">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <header>
-    <h1>Martín Pilú</h1>
-    <p>Landing page personal</p>
-  </header>
+  <!-- 1. Portada -->
+  <section id="portada" class="hero">
+    <img class="hero__photo" src="content/profile_picture.png" alt="Foto de Martín Pilu" width="1862" height="1035">
+    <h1>Martín Pilu</h1>
+    <p class="hero__intro">Técnico electrónico e investigador autodidacta enfocado en el punto de encuentro entre ciencia, tecnología y arte. Con amplia experiencia en el ámbito audiovisual e instalaciones interactivas (teatro, sonido, video, iluminación y publicidad BTL), actualmente desempeñándose en investigación y desarrollo para la industria biotecnológica. Su trabajo abarca desde el desarrollo técnico, la automatización, el Project Management y el prototipado rápido, hasta la docencia y el dictado de talleres y workshops.</p>
+    <a class="hero__cta" href="#feed" aria-label="Ver trabajos">↓</a>
+  </section>
 
-  <main>
-    <section id="proyectos">
-      <h2>Proyectos</h2>
-      <ul>
-        <li><a href="../projects/SACP/landing/index.html">SACP - Sistema de Administración de Consorcio de Propietarios</a></li>
-        <li><a href="../projects/Radio_Jurney/landing/index.html">Radio Jurney - Herramientas y proyectos de radioafición</a></li>
-      </ul>
-    </section>
+  <!-- 2. Mosaico de trabajos (se renderiza desde feed.json) -->
+  <main id="feed" class="feed" aria-live="polite">
+    <p class="feed__status">Cargando trabajos…</p>
   </main>
 
-  <footer>
-    <p>&copy; 2026 Martín Pilú</p>
-  </footer>
+  <dialog id="viewer" class="viewer">
+    <button class="viewer__close" aria-label="Cerrar">×</button>
+    <div class="viewer__body"></div>
+  </dialog>
 
+  <!-- 3. Recursos y contacto -->
+  <section id="contacto" class="contact">
+    <hr class="contact__spacer" aria-hidden="true">
+    <div class="contact__bio">
+      <div lang="es">
+        <h3>Martín Pilu (Argentina, 1987)</h3>
+        <p>Ingeniero electrónico y tecnólogo creativo que trabaja en la intersección entre arte, ciencia y tecnología. Con más de 15 años de experiencia, desarrolla sistemas electrónicos, audiovisuales e interactivos en contextos artísticos, culturales y científicos.</p>
+        <p>Desde 2007 trabaja de forma independiente en el campo multimedia, creando instalaciones interactivas, entornos escénicos, interfaces experimentales y sistemas tecnológicos a medida para artistas, instituciones y eventos públicos de gran escala. Su práctica se apoya en la electrónica, los sistemas embebidos, las tecnologías de sonido y video y la interacción en tiempo real, desarrollada con un enfoque investigativo y práctico.</p>
+        <p>Actualmente, Martín trabaja en la industria biotecnológica, donde lidera el desarrollo de sistemas tecnológicos innovadores. Su trabajo se centra en electrónica, automatización e ingeniería de sistemas, integrando investigación científica, diseño de ingeniería y colaboración interdisciplinaria.</p>
+        <p>A lo largo de su carrera se formó en artes electrónicas, diseño y tecnologías del sonido, construyendo una práctica multidisciplinaria que une el rigor técnico con la exploración artística.</p>
+      </div>
+      <div lang="en">
+        <h3>Martín Pilu (Argentina, 1987)</h3>
+        <p>Electronic engineer and creative technologist working at the intersection of art, science, and technology. With over 15 years of experience, he develops electronic, audiovisual, and interactive systems across artistic, cultural, and scientific contexts.</p>
+        <p>Since 2007, he has worked independently in the multimedia field, creating interactive installations, stage environments, experimental interfaces, and custom technological systems for artists, institutions, and large-scale public events. His practice is grounded in electronics, embedded systems, sound and video technologies, and real-time interaction, developed through a research-driven and hands-on approach.</p>
+        <p>Currently, Martín works in the biotechnology industry, where he leads the development of innovative technological systems. His work focuses on electronics, automation, and systems engineering, integrating scientific research, engineering design, and interdisciplinary collaboration.</p>
+        <p>Throughout his career, he has studied and trained in electronic arts, design, and sound technologies, shaping a multidisciplinary practice that bridges technical rigor and artistic exploration.</p>
+      </div>
+    </div>
+    <ul class="contact__links">
+      <li><a href="mailto:edj.pilu@gmail.com">Email</a></li>
+      <li><a href="https://github.com/MartinPilu">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/mart%C3%ADn-l%C3%B3pez-palermo-3b042686/">LinkedIn</a></li>
+      <li><a href="https://www.instagram.com/piluxt/"">Instagram</a></li>
+    </ul>
+    <p class="contact__copy">&copy; 2026 Martín Pilu</p>
+  </section>
+
+  <script src="feed.js" onerror="void 0"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>
